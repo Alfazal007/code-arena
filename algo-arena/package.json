@@ -1,5 +1,5 @@
 {
-  "name": "algoarena",
+  "name": "algo-arena",
   "private": true,
   "scripts": {
     "build": "turbo build",
