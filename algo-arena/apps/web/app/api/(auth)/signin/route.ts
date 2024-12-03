@@ -6,6 +6,7 @@ import prisma from "@repo/database/client";
 import { compareHashPassword } from "../../../../utils/hashPassword";
 import { ApiResponse } from "../../../../utils/apiResponse";
 import { generateAccessToken, generateRefreshToken } from "../../../../utils/tokenGenerate";
+import { redisClient } from "../../../../utils/redis";
 
 export async function POST(request: NextRequest) {
     try {
@@ -47,6 +48,12 @@ export async function POST(request: NextRequest) {
             refreshToken: generateRefreshToken(existingUserFromDB)
         }
 
+        if (!redisClient.isOpen) {
+            await redisClient.connect()
+        }
+        await redisClient.set(`auth:${existingUserFromDB.username}`, tokens.accessToken, {
+            EX: 24 * 60 * 60
+        });
         return NextResponse.json(new ApiResponse(200, loginSuccess, tokens), { status: 200 })
     } catch (err) {
         return NextResponse.json(new ApiError(400, issueWithDatabaseString, [], []), { status: 400 })

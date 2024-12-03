@@ -6,3 +6,4 @@ export const noRequestBodyString = "No request body given";
 export const userNotFoundString = "User not found";
 export const invalidPassword = "Incorrect password";
 export const loginSuccess = "Login successful";
+export const relogin = "Login before using the service"
