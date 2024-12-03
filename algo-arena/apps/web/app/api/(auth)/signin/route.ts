@@ -43,9 +43,11 @@ export async function POST(request: NextRequest) {
         if (!isValidUser) {
             return NextResponse.json(new ApiError(400, invalidPassword, [], []), { status: 400 });
         }
+        const accessToken = await generateAccessToken(existingUserFromDB);
+        const refreshToken = await generateRefreshToken(existingUserFromDB);
         const tokens = {
-            accessToken: generateAccessToken(existingUserFromDB),
-            refreshToken: generateRefreshToken(existingUserFromDB)
+            accessToken,
+            refreshToken
         }
 
         if (!redisClient.isOpen) {

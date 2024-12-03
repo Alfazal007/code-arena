@@ -1,34 +1,35 @@
 import jwt from "jsonwebtoken";
 import { envFiles } from "./envLoader";
+import { importJWK, SignJWT } from "jose";
 
-export function generateAccessToken(user: {
+export async function generateAccessToken(user: {
     username: string;
     email: string;
     password: string;
     id: string;
-}): string {
-    const token = jwt.sign({
-        username: user.username,
-        email: user.email,
-        id: user.id
-    }, envFiles.accessTokenSecret, {
-        expiresIn: "24h"
-    });
-    return token;
+}): Promise<string> {
+    const jwk = await importJWK({ k: envFiles.accessTokenSecret, alg: 'HS256', kty: 'oct' });
+
+    const jwt = await new SignJWT({ username: user.username, id: user.id, email: user.email })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('1d')
+        .sign(jwk);
+    return jwt;
 }
 
-export function generateRefreshToken(user: {
+export async function generateRefreshToken(user: {
     username: string;
     email: string;
     password: string;
     id: string;
-}): string {
-    const token = jwt.sign({
-        username: user.username,
-        email: user.email,
-        id: user.id
-    }, envFiles.refreshTokenSecret, {
-        expiresIn: "7d"
-    });
-    return token;
+}): Promise<string> {
+    const jwk = await importJWK({ k: envFiles.accessTokenSecret, alg: 'HS256', kty: 'oct' });
+
+    const jwt = await new SignJWT({ username: user.username, id: user.id, email: user.email })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('10d')
+        .sign(jwk);
+    return jwt;
 }
