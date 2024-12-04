@@ -1,4 +1,4 @@
-import { generateRustCodePartial } from "./generateRustCode.js";
+import { generateRustCodePartial, gettingUserInputsInRust } from "./generateRustCode.js";
 import { generateTSCodePartial } from "./generateTypescriptCode.js";
 
 export interface VariableType {
@@ -8,7 +8,8 @@ export interface VariableType {
 
 export interface PartialCode {
     rustCode: string,
-    tsCode: string
+    tsCode: string,
+    rustCompleteCode: string
 }
 
 export function generateCode(lines: string[]): PartialCode {
@@ -58,10 +59,12 @@ export function generateCode(lines: string[]): PartialCode {
     });
 
     const rustCodePartial = generateRustCodePartial(functionName, inputs, outputs);
+    const rustCodeComplete = gettingUserInputsInRust(inputs, functionName);
     const tsCodePartial = generateTSCodePartial(functionName, inputs, outputs);
 
     return {
         rustCode: rustCodePartial,
-        tsCode: tsCodePartial
+        tsCode: tsCodePartial,
+        rustCompleteCode: rustCodeComplete + rustCodePartial
     }
 }
