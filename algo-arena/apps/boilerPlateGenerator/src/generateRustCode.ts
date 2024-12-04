@@ -40,12 +40,67 @@ export function generateRustCodePartial(functionName: string, inputs: VariableTy
     return rustCode;
 }
 
-export function gettingUserInputsInRust(inputs: VariableType[], path: string): string {
-    let inputTaker = ``;
+
+
+
+
+// ================================================
+export function gettingUserInputsInRust(inputs: VariableType[], path: string, functionName: string): string {
+    let inputTaker = `
+        use std::fs::File;
+        use std::io::{self, BufRead};
+        use std::path::Path;
+
+        fn main() {
+        let path = "${path}";
+        let input = File::open(path).expect("Failed to open file");
+        let buffered = io::BufReader::new(input);
+        let mut lines = buffered.lines();
+    `;
     inputs.map((input) => {
+        const nextInputType = rustType(input.typeOfVariable);
+        if (nextInputType.includes("Vec")) {
+            // For vector inputs, read count and the actual data
+            inputTaker += `
+        let ${input.nameOfVariable}_count: usize = lines.next()
+            .expect("Missing line for ${input.nameOfVariable} count")
+            .expect("Failed to read line")
+            .trim()
+            .parse()
+            .expect("Invalid number for ${input.nameOfVariable} count");
+
+        let ${input.nameOfVariable}: Vec<${nextInputType.replace("Vec<", "").replace(">", "")}> = lines.next()
+            .expect("Missing line for ${input.nameOfVariable} data")
+            .expect("Failed to read line")
+            .trim()
+            .split_whitespace()
+            .take(${input.nameOfVariable}_count)
+            .map(|x| x.parse().expect("Invalid input in ${input.nameOfVariable}"))
+            .collect();
+        `;
+        } else {
+            inputTaker += `
+        let ${input.nameOfVariable}: ${nextInputType} = lines.next()
+            .expect("Missing line for ${input.nameOfVariable}")
+            .expect("Failed to read line")
+            .trim()
+            .parse()
+            .expect("Invalid input for ${input.nameOfVariable}");
+        `;
+        }
     });
     return inputTaker;
 }
+
+
+
+
+
+
+
+
+
+
 
 function rustType(type: string) {
     switch (type) {
