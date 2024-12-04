@@ -8,7 +8,8 @@ function main() {
     }
     const data = fs.readFileSync(pathToTheStructureFile, 'utf8');
     const lines = data.split('\n');
-    generateCode(lines);
+    let codes = generateCode(lines);
+    console.log({ codes })
 }
 
 main();

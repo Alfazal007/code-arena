@@ -1,6 +1,6 @@
 import { VariableType } from "./generateCode.js";
 
-export function generateRustCode(functionName: string, inputs: VariableType[], outputs: string[]) {
+export function generateRustCodePartial(functionName: string, inputs: VariableType[], outputs: string[]) {
     let rustCode = `fn ${functionName}(`;
     for (let i = 0; i < inputs.length; i++) {
         let input = inputs[i];
@@ -38,6 +38,13 @@ export function generateRustCode(functionName: string, inputs: VariableType[], o
     rustCode += `\n    // Write your code here`
     rustCode += "\n}"
     return rustCode;
+}
+
+export function gettingUserInputsInRust(inputs: VariableType[], path: string): string {
+    let inputTaker = ``;
+    inputs.map((input) => {
+    });
+    return inputTaker;
 }
 
 function rustType(type: string) {
