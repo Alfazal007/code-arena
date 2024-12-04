@@ -18,6 +18,7 @@ function main() {
     fs.writeFileSync(path.join(partialBoilerPlatePath, "partial.rs"), codes.rustCode, 'utf8');
     fs.writeFileSync(path.join(fullBoilerPlatePath, "main.rs"), codes.rustCompleteCode, 'utf8');
     fs.writeFileSync(path.join(partialBoilerPlatePath, "partial.ts"), codes.tsCode, 'utf8');
+    fs.writeFileSync(path.join(fullBoilerPlatePath, "main.ts"), codes.tsCompleteCode, 'utf8');
 }
 
 main();
