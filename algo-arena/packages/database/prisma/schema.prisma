@@ -8,8 +8,27 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  email    String @unique
-  username String @unique
-  password String
+  id          String        @id @default(uuid())
+  email       String        @unique
+  username    String        @unique
+  password    String
+  userProblem UserProblem[]
+}
+
+model Problems {
+  id          String        @id @default(uuid())
+  testCases   Int
+  halfCode    String
+  fullCode    String
+  userProblem UserProblem[]
+}
+
+model UserProblem {
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  problemId  String
+  createdAt  DateTime  @default(now())
+  Problems   Problems? @relation(fields: [problemsId], references: [id])
+  problemsId String?
 }
