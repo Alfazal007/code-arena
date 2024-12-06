@@ -12,6 +12,7 @@ model User {
   email       String        @unique
   username    String        @unique
   password    String
+  isPremium   Boolean       @default(false)
   userProblem UserProblem[]
 }
 
@@ -27,11 +28,14 @@ model Problems {
 }
 
 model UserProblem {
-  id         String    @id @default(uuid())
-  userId     String
-  user       User      @relation(fields: [userId], references: [id])
-  problemId  String
-  createdAt  DateTime  @default(now())
-  Problems   Problems? @relation(fields: [problemsId], references: [id])
-  problemsId String?
+  id                 String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id])
+  problemId          String
+  createdAt          DateTime @default(now())
+  Problems           Problems @relation(fields: [problemId], references: [id])
+  isCompleted        Boolean  @default(false)
+  isErrorPresent     Boolean  @default(false)
+  errorMessage       String   @default("")
+  completedTestCases Int      @default(0)
 }

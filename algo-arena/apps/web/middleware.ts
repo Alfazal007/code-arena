@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.json(new ApiError(401, relogin, [], []), { status: 401 })
     }
     const res = NextResponse.next();
-    let headerValues = { username: decodedValue.username, email: decodedValue.email, id: decodedValue.id };
+    let headerValues = { username: decodedValue.username, email: decodedValue.email, id: decodedValue.id, isPremium: decodedValue.isPremium };
     res.headers.set('x-user', JSON.stringify(headerValues));
     return res;
 }
@@ -34,12 +34,12 @@ export const config = {
     runtime: 'nodejs'
 }
 
-export async function verifyJWT(token: string): Promise<null | { username: string, email: string, id: string }> {
+export async function verifyJWT(token: string): Promise<null | { username: string, email: string, id: string, isPremium: boolean }> {
     const secret = envFiles.accessTokenSecret
     try {
         const jwk = await importJWK({ k: secret, alg: 'HS256', kty: 'oct' });
         const { payload } = await jwtVerify(token, jwk);
-        return { username: payload.username as string, email: payload.email as string, id: payload.id as string };
+        return { username: payload.username as string, email: payload.email as string, id: payload.id as string, isPremium: payload.isPremium as boolean };
     } catch (error) {
         console.error('Invalid token:', error);
         return null;
