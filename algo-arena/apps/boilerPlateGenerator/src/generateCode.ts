@@ -8,9 +8,10 @@ export interface VariableType {
 
 export interface PartialCode {
     rustCode: string,
-    tsCode: string,
+    jsCode: string,
     rustCompleteCode: string,
-    tsCompleteCode: string
+    jsCompleteCode: string,
+    nameOfProgram: string
 }
 
 export function generateCode(lines: string[]): PartialCode {
@@ -19,7 +20,15 @@ export function generateCode(lines: string[]): PartialCode {
     let outputs: string[] = []
     let inputStarted = false;
     let outputStarted = false;
+    let programName = "";
     lines.map((line) => {
+        if (line.includes("Problem Name")) {
+            let nameOfProgram = line.split(":")[1]
+            if (!nameOfProgram) {
+                throw new Error("Invalid format in function name")
+            }
+            programName = nameOfProgram.trim()
+        }
         if (line.includes("Function Name")) {
             let splitLines = line.split(":")[1]
             if (!splitLines) {
@@ -66,8 +75,9 @@ export function generateCode(lines: string[]): PartialCode {
 
     return {
         rustCode: rustCodePartial,
-        tsCode: tsCodePartial,
+        jsCode: tsCodePartial,
         rustCompleteCode: rustCodeComplete + rustCodePartial,
-        tsCompleteCode: tsCodeComplete + tsCodePartial
+        jsCompleteCode: tsCodeComplete + tsCodePartial,
+        nameOfProgram: programName
     }
 }

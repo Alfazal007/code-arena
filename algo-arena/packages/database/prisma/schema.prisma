@@ -16,11 +16,14 @@ model User {
 }
 
 model Problems {
-  id          String        @id @default(uuid())
-  testCases   Int
-  halfCode    String
-  fullCode    String
-  userProblem UserProblem[]
+  id           String        @id @default(uuid())
+  testCases    Int
+  name         String        @unique
+  halfCodeRust String
+  fullCodeRust String
+  halfCodeJS   String
+  fullCodeJS   String
+  userProblem  UserProblem[]
 }
 
 model UserProblem {

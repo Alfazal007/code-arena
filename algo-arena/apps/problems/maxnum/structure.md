@@ -1,4 +1,4 @@
-Problem Name: "Max Element"
+Problem Name: Max-Element
 Function Name: maxelement
 Input Structure:
 Input Field: list<int> arr
