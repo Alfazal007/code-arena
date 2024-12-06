@@ -39,67 +39,38 @@ export function generateTSCodePartial(functionName: string, inputs: VariableType
 }
 
 
-export function gettingUserInputsInTS(inputs: VariableType[], functionName: string): string {
+
+
+export function gettingUserInputsInTS(inputs: { nameOfVariable: string, typeOfVariable: string }[], functionName: string): string {
     let inputTaker = `
-import * as fs from 'fs';
-import * as path from 'path';
-
-async function processInputFiles() {
-    const testFolder = '../test/';
-
-// Read all .txt files in the test directory
-    const files = fs.readdirSync(testFolder)
-        .filter(file => path.extname(file) === '.txt');
-
-    for (const file of files) {
-        const filePath = path.join(testFolder, file);
-        const fileContent = fs.readFileSync(filePath, 'utf-8');
-        const lines = fileContent.trim().split('\\n');
-        let lineIndex = 0;
-    `;
+const input = require("fs").readFileSync("/dev/stdin", "utf8").trim().split("\\n").join(" ").split(" ");
+`;
 
     inputs.forEach((input) => {
         const nextInputType = typescripttype(input.typeOfVariable);
 
         if (nextInputType.endsWith('[]')) {
-            // For array inputs, read count and the actual data
             inputTaker += `
-        const ${input.nameOfVariable}_count: number = parseInt(lines[lineIndex++].trim());
-        const ${input.nameOfVariable}: ${nextInputType} = lines[lineIndex++]
-            .trim()
-            .split(/\\s+/)
-            .slice(0, ${input.nameOfVariable}_count)
-            .map(x => ${nextInputType === 'number[]' ? 'parseFloat(x)' :
-                    nextInputType === 'boolean[]' ? '(x === "true")' :
-                        'x'
-                });
-            `;
+        const ${input.nameOfVariable}_count = input.shift();
+        const ${input.nameOfVariable} = input.splice(0, ${input.nameOfVariable}_count);
+`;
         } else {
             inputTaker += `
-        const ${input.nameOfVariable}: ${nextInputType} = ${nextInputType === 'number' ? 'parseFloat' :
-                    nextInputType === 'boolean' ? '(x => x === "true")' :
-                        ''
-                }(lines[lineIndex++].trim());
+        const ${input.nameOfVariable} = ${nextInputType === 'number' ? 'parseFloat' : nextInputType === 'boolean' ? '(x => x === "true")' : ''}(input.shift());
             `;
         }
     });
 
     const inputToFunction = inputs.map(input => input.nameOfVariable).join(', ');
-    const outputVariables = 'res';
 
     inputTaker += `
-        // Call the function with inputs from the file
-        const ${outputVariables} = ${functionName}(${inputToFunction});
-    }
-}
-
-// Call the function to process input files
-processInputFiles().catch(console.error);
+    // Call the function with inputs from the array
+    const res = ${functionName}(${inputToFunction});
+    console.log(res);
 `;
 
     return inputTaker;
 }
-
 function typescripttype(type: string) {
     switch (type) {
         case "int":
