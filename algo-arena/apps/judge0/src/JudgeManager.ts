@@ -10,12 +10,13 @@ export class JudgeManager {
         return JudgeManager.instance;
     }
 
-    async createSummission() {
+    async createRustSummission({ sourceCode, stdin, testNo, programId }: { sourceCode: string, stdin: string, testNo: number, programId: string }) {
         const res = await axios.post("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=true&fields=*",
             {
-                "source_code": "Y29uc3QgaW5wdXQgPSByZXF1aXJlKCJmcyIpLnJlYWRGaWxlU3luYygiL2Rldi9zdGRpbiIsICJ1dGY4IikudHJpbSgpLnNwbGl0KCJcbiIpLmpvaW4oIiAiKS5zcGxpdCgiICIpOwoKY29uc3QgYXJyX2NvdW50ID0gaW5wdXQuc2hpZnQoKTsKY29uc3QgYXJyID0gaW5wdXQuc3BsaWNlKDAsIGFycl9jb3VudCk7CgovLyBDYWxsIHRoZSBmdW5jdGlvbiB3aXRoIGlucHV0cyBmcm9tIHRoZSBhcnJheQpjb25zdCByZXMgPSBtYXhlbGVtZW50KGFycik7CmNvbnNvbGUubG9nKHJlcyk7CmZ1bmN0aW9uIG1heGVsZW1lbnQoYXJyKSB7CiAgICAvLyBXcml0ZSB5b3VyIGNvZGUgaGVyZQogICAgbGV0IHJlcyA9IDA7CiAgICBmb3IgKGxldCBpID0gMDsgaSA8IGFyci5sZW5ndGg7IGkrKykgewogICAgICAgIHJlcyA9IE1hdGgubWF4KHJlcywgYXJyW2ldKTsKICAgIH0KICAgIHJldHVybiByZXM7Cn0=",
-                "language_id": 93,
-                "stdin": "NgoxMCAyMCAzMCA1NSA2OSA3Cg=="
+                "source_code": sourceCode,
+                "language_id": 73,//93
+                "stdin": stdin,
+                "cpu_time_limit": 2
             },
             {
                 headers: {
@@ -25,5 +26,25 @@ export class JudgeManager {
             }
         );
         console.log({ res: res.data })
+        // update in the database
+    }
+
+    async createJSSummission({ sourceCode, stdin, testNo, programId }: { sourceCode: string, stdin: string, testNo: number, programId: string }) {
+        const res = await axios.post("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=true&fields=*",
+            {
+                "source_code": sourceCode,
+                "language_id": 93,
+                "stdin": stdin,
+                "cpu_time_limit": 2
+            },
+            {
+                headers: {
+                    "x-rapidapi-host": envFiles.apiHost,
+                    "x-rapidapi-key": envFiles.apiKey
+                }
+            }
+        );
+        console.log({ res: res.data })
+        // update in the database
     }
 }

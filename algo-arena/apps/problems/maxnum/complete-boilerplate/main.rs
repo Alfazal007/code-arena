@@ -1,41 +1,21 @@
 
-use std::fs::{self, File};
-use std::io::{self, BufRead};
-use std::path::Path;
+use std::fs::File;
+use std::io::Read;
 
 fn main() {
-    let test_folder = "../test/";
-    let paths = fs::read_dir(test_folder)
-        .expect("Failed to read the test directory");
+    let mut file = File::open("/dev/stdin").expect("Failed to open input file");
+    let mut input = String::new();
+    file.read_to_string(&mut input).expect("Failed to read file");
+    let mut input_iter = input.trim().split_whitespace();
 
-    // Iterate over each file in the test directory
-    for path in paths {
-        let path = path.expect("Failed to read path").path();
-        if path.extension().and_then(|s| s.to_str()) == Some("txt") {
-            let input = File::open(&path).expect("Failed to open file");
-            let buffered = io::BufReader::new(input);
-            let mut lines = buffered.lines();
-    
-            let arr_count: usize = lines.next()
-                .expect("Missing line for arr count")
-                .expect("Failed to read line")
-                .trim()
-                .parse()
-                .expect("Invalid number for arr count");
+    let arr_count: usize = input_iter.next().unwrap().parse().unwrap();
+    let arr: Vec<i32> = input_iter
+        .take(arr_count)
+        .map(|x| x.parse().unwrap())
+        .collect();
 
-            let arr: Vec<i32> = lines.next()
-                .expect("Missing line for arr data")
-                .expect("Failed to read line")
-                .trim()
-                .split_whitespace()
-                .take(arr_count)
-                .map(|x| x.parse().expect("Invalid input in arr"))
-                .collect();
-            
-            // Call the function with inputs from the file
-            let res = maxelement(arr);
-        }
-    }
+    let res = maxelement(arr);
+    println!("{}", res);
 }
 fn maxelement(arr: Vec<i32>)-> i32 {
     // Write your code here

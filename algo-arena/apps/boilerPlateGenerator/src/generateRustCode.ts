@@ -42,70 +42,39 @@ export function generateRustCodePartial(functionName: string, inputs: VariableTy
 
 export function gettingUserInputsInRust(inputs: VariableType[], functionName: string): string {
     let inputTaker = `
-use std::fs::{self, File};
-use std::io::{self, BufRead};
-use std::path::Path;
+use std::fs::File;
+use std::io::Read;
 
 fn main() {
-    let test_folder = "../test/";
-    let paths = fs::read_dir(test_folder)
-        .expect("Failed to read the test directory");
+    let mut file = File::open("/dev/stdin").expect("Failed to open input file");
+    let mut input = String::new();
+    file.read_to_string(&mut input).expect("Failed to read file");
+    let mut input_iter = input.trim().split_whitespace();
+`;
 
-    // Iterate over each file in the test directory
-    for path in paths {
-        let path = path.expect("Failed to read path").path();
-        if path.extension().and_then(|s| s.to_str()) == Some("txt") {
-            let input = File::open(&path).expect("Failed to open file");
-            let buffered = io::BufReader::new(input);
-            let mut lines = buffered.lines();
-    `;
+    inputs.forEach((input) => {
+        const rustVarType = rustType(input.typeOfVariable);
 
-    inputs.map((input) => {
-        const nextInputType = rustType(input.typeOfVariable);
-        if (nextInputType.includes("Vec")) {
-            // For vector inputs, read count and the actual data
+        if (rustVarType.startsWith("Vec")) {
             inputTaker += `
-            let ${input.nameOfVariable}_count: usize = lines.next()
-                .expect("Missing line for ${input.nameOfVariable} count")
-                .expect("Failed to read line")
-                .trim()
-                .parse()
-                .expect("Invalid number for ${input.nameOfVariable} count");
-
-            let ${input.nameOfVariable}: Vec<${nextInputType.replace("Vec<", "").replace(">", "")}> = lines.next()
-                .expect("Missing line for ${input.nameOfVariable} data")
-                .expect("Failed to read line")
-                .trim()
-                .split_whitespace()
-                .take(${input.nameOfVariable}_count)
-                .map(|x| x.parse().expect("Invalid input in ${input.nameOfVariable}"))
-                .collect();
-            `;
+    let ${input.nameOfVariable}_count: usize = input_iter.next().unwrap().parse().unwrap();
+    let ${input.nameOfVariable}: ${rustVarType} = input_iter
+        .take(${input.nameOfVariable}_count)
+        .map(|x| x.parse().unwrap())
+        .collect();
+`;
         } else {
             inputTaker += `
-            let ${input.nameOfVariable}: ${nextInputType} = lines.next()
-                .expect("Missing line for ${input.nameOfVariable}")
-                .expect("Failed to read line")
-                .trim()
-                .parse()
-                .expect("Invalid input for ${input.nameOfVariable}");
-            `;
+    let ${input.nameOfVariable}: ${rustVarType} = input_iter.next().unwrap().parse().unwrap();
+`;
         }
     });
 
-    let inputToFunction: string[] = []
-    inputs.map((input) => {
-        inputToFunction.push(input.nameOfVariable)
-    });
-    let variables = inputToFunction.join(", ")
-    let outputVariables = "";
-    outputVariables = "res"
+    const inputToFunction = inputs.map(input => input.nameOfVariable).join(", ");
 
     inputTaker += `
-            // Call the function with inputs from the file
-            let ${outputVariables} = ${functionName}(${variables});
-        }
-    }
+    let res = ${functionName}(${inputToFunction});
+    println!("{}", res);
 }
 `;
     return inputTaker;

@@ -1,3 +1,3 @@
-function maxelement(arr: number[]): number {
+function maxelement(arr) {
     // Write your code here
 }
