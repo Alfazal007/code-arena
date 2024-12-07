@@ -4,6 +4,10 @@ import axios from "axios";
 import fs from "fs";
 import path from "path";
 
+type ResponseTokens = {
+    token: string
+}
+
 export class JudgeManager {
     private static instance: JudgeManager;
     static getInstance(): JudgeManager {
@@ -35,7 +39,11 @@ export class JudgeManager {
             }
         );
         if (res.status != 201) {
+            // TODO:: api for a failed submission endpoint
             return;
+        } else {
+            const tokens = res.data as ResponseTokens[];
+            console.log({ tokens })
         }
     }
 

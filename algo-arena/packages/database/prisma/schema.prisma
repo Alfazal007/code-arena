@@ -40,4 +40,5 @@ model UserProblem {
   isErrorPresent     Boolean  @default(false)
   errorMessage       String   @default("")
   completedTestCases Int      @default(0)
+  testcaseStatus     Json     @default("[]")
 }
