@@ -3,10 +3,12 @@ import { envFiles } from "./loadEnv";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
+import { env } from "process";
 
 type ResponseTokens = {
     token: string
 }
+type DataToBeSent = { requestData: ResponseTokens[], secret: string, submissionId: string }
 
 export class JudgeManager {
     private static instance: JudgeManager;
@@ -18,32 +20,40 @@ export class JudgeManager {
     }
 
     async createRustSummission({ stdin, submissionInfo }: { submissionInfo: ReceivedSubmissionMessage, stdin: string[] }) {
-        const outputsRequired = this.readOutputFile(submissionInfo.problemName);
-        const inputsToJudge: { source_code: string, language_id: number, expected_output: string }[] = [];
-        for (let i = 0; i < outputsRequired.length; i++) {
-            inputsToJudge.push({
-                source_code: submissionInfo.submittedCode,
-                language_id: 73,
-                expected_output: outputsRequired[i] as string
-            });
-        }
-        const res = await axios.post("https://judge0-ce.p.rapidapi.com/submissions/batch?base64_encoded=true",
-            {
-                "submissions": inputsToJudge
-            },
-            {
-                headers: {
-                    "x-rapidapi-host": envFiles.apiHost,
-                    "x-rapidapi-key": envFiles.apiKey
-                }
+        try {
+            const outputsRequired = this.readOutputFile(submissionInfo.problemName);
+            const inputsToJudge: { source_code: string, language_id: number, expected_output: string }[] = [];
+            for (let i = 0; i < outputsRequired.length; i++) {
+                inputsToJudge.push({
+                    source_code: submissionInfo.submittedCode,
+                    language_id: 73,
+                    expected_output: outputsRequired[i] as string
+                });
             }
-        );
-        if (res.status != 201) {
-            // TODO:: api for a failed submission endpoint
-            return;
-        } else {
-            const tokens = res.data as ResponseTokens[];
-            console.log({ tokens })
+            const res = await axios.post("https://judge0-ce.p.rapidapi.com/submissions/batch?base64_encoded=true",
+                {
+                    "submissions": inputsToJudge
+                },
+                {
+                    headers: {
+                        "x-rapidapi-host": envFiles.apiHost,
+                        "x-rapidapi-key": envFiles.apiKey
+                    }
+                }
+            );
+            if (res.status != 201) {
+                return;
+            } else {
+                const tokens = res.data as ResponseTokens[];
+                const dataToBeSent: DataToBeSent = {
+                    secret: envFiles.secretUrl,
+                    submissionId: submissionInfo.submissionId,
+                    requestData: tokens
+                }
+                await axios.post("http://localhost:3001/api/updateSubmission", dataToBeSent);
+            }
+        } catch (err) {
+            console.log(err)
         }
     }
 
