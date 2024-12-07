@@ -5,14 +5,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "type": "module",
+    "module": "CommonJS",         
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
     "@repo/typescript-config": "*",
+    "@repo/database": "*",
     "typescript": "^5.7.2",
-    "@repo/database": "*"
+    "@types/node": "^20"
   }
 }

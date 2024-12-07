@@ -1,4 +1,4 @@
-import { VariableType } from "./generateCode.js";
+import { VariableType } from "./generateCode";
 
 export function generateJSCodePartial(functionName: string, inputs: VariableType[], outputs: string[]) {
     let tsCode = `function ${functionName}(`;

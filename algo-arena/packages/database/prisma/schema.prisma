@@ -17,23 +17,25 @@ model User {
 }
 
 model Problems {
-  id           String        @id @default(uuid())
-  testCases    Int
-  name         String        @unique
-  halfCodeRust String
-  fullCodeRust String
-  halfCodeJS   String
-  fullCodeJS   String
-  userProblem  UserProblem[]
+  id                  String        @id @default(uuid())
+  testCases           Int
+  name                String        @unique
+  halfCodeRust        String
+  fullCodeRust        String
+  inputTakingCodeRust String
+  inputTakingCodeJS   String
+  halfCodeJS          String
+  fullCodeJS          String
+  userProblem         UserProblem[]
 }
 
 model UserProblem {
   id                 String   @id @default(uuid())
   userId             String
-  user               User     @relation(fields: [userId], references: [id])
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   problemId          String
   createdAt          DateTime @default(now())
-  Problems           Problems @relation(fields: [problemId], references: [id])
+  Problems           Problems @relation(fields: [problemId], references: [id], onDelete: Cascade)
   isCompleted        Boolean  @default(false)
   isErrorPresent     Boolean  @default(false)
   errorMessage       String   @default("")

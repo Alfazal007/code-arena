@@ -1,4 +1,4 @@
-import { VariableType } from "./generateCode.js";
+import { VariableType } from "./generateCode";
 
 export function generateRustCodePartial(functionName: string, inputs: VariableType[], outputs: string[]) {
     let rustCode = `fn ${functionName}(`;

@@ -1,7 +1,7 @@
-import fs from "fs";
-import { generateCode } from "./generateCode.js";
+import { generateCode } from "./generateCode";
 import path from "path"
-import prisma from "@repo/database/client";
+import prisma from "../../../packages/database/dist/index";
+import fs from "fs";
 
 async function main() {
     try {
@@ -23,16 +23,39 @@ async function main() {
         fs.writeFileSync(path.join(partialBoilerPlatePath, "partial.ts"), codes.jsCode, 'utf8');
         fs.writeFileSync(path.join(fullBoilerPlatePath, "main.ts"), codes.jsCompleteCode, 'utf8');
         try {
-            const createdProblem = await prisma.default.problems.create({
+            console.log("deleting existing version of the code");
+
+            const problem = await prisma.problems.findUnique({
+                where: {
+                    name: codes.nameOfProgram
+                },
+            });
+
+            if (!problem) {
+                console.log("Problem not found. Skipping deletion.");
+            } else {
+                await prisma.problems.delete({
+                    where: {
+                        name: codes.nameOfProgram
+                    },
+                });
+                console.log("Problem deleted successfully.");
+            }
+
+            console.log("Adding new version of the code");
+            const createdProblem = await prisma.problems.create({
                 data: {
                     name: codes.nameOfProgram,
                     testCases: testCases,
                     fullCodeJS: codes.jsCompleteCode,
                     halfCodeJS: codes.jsCode,
                     fullCodeRust: codes.rustCompleteCode,
-                    halfCodeRust: codes.rustCode
+                    halfCodeRust: codes.rustCode,
+                    inputTakingCodeJS: codes.jsCodeToAddToUserCode,
+                    inputTakingCodeRust: codes.rustCodeToAddToUserCode
                 }
             });
+            console.log("Added problem to the database");
             console.log({ createdProblem })
         } catch (err) {
             console.log("Issue writing to the database");
