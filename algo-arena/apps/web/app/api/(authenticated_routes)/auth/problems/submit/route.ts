@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
     if (!currentUser) {
         return NextResponse.json(new ApiError(401, relogin, [], []), { status: 401 })
     }
+
     try {
         let requestBody;
         try {
@@ -40,8 +41,10 @@ export async function POST(request: NextRequest) {
             createdAt: Date;
             problemsId: string | null;
         };
+
         try {
             await kafkaProducer.connect()
+
             try {
                 submittedProblem = await prisma.userProblem.create({
                     data: {
@@ -52,16 +55,25 @@ export async function POST(request: NextRequest) {
             } catch (err) {
                 return NextResponse.json(new ApiError(400, issueWithDatabaseString, [], []), { status: 400 })
             }
+            const dataToBeSentToKafka = {
+                submittedCode: zodParsedData.data.code,
+                language: zodParsedData.data.language,
+                problemId: zodParsedData.data.problemId,
+                userId: currentUser.id,
+                submissionId: submittedProblem.id
+            }
+
             await kafkaProducer.send({
-                topic: `premiumQueue:${currentUser.isPremium}`,
+                topic: `premiumQueue-${currentUser.isPremium}`,
                 messages: [{
-                    value: JSON.stringify(zodParsedData.data),
+                    value: JSON.stringify(dataToBeSentToKafka),
                     key: currentUser.id
                 }]
             });
         } catch (err) {
             return NextResponse.json(new ApiError(400, issueWithKafka, [], []), { status: 400 })
         }
+
         return NextResponse.json(new ApiResponse(200, successfulProblemSubmission, {
             problemSubmissionId: submittedProblem.id
         }), { status: 200 })
