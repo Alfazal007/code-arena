@@ -1,5 +1,8 @@
+import { ReceivedSubmissionMessage } from ".";
 import { envFiles } from "./loadEnv";
 import axios from "axios";
+import fs from "fs";
+import path from "path";
 
 export class JudgeManager {
     private static instance: JudgeManager;
@@ -47,4 +50,28 @@ export class JudgeManager {
         console.log({ res: res.data })
         // update in the database
     }
+
+    async handleSubmissionInit(submission: ReceivedSubmissionMessage) {
+        const testCaseFolder = path.resolve(__dirname, `../../problems/${submission.problemName}/test`);
+        let inputs: string[] = [];
+        try {
+            if (!fs.existsSync(testCaseFolder)) {
+                throw new Error(`Directory does not exist: ${testCaseFolder}`);
+            }
+
+            const files = fs.readdirSync(testCaseFolder);
+
+            inputs = files
+                .filter(file => path.extname(file) === '.txt')
+                .map(file => {
+                    const filePath = path.join(testCaseFolder, file);
+                    return btoa(fs.readFileSync(filePath, 'utf8'));
+                });
+        } catch (error) {
+            console.error('Error reading test case files:', error);
+            throw error;
+        }
+        console.log(inputs)
+    }
 }
+

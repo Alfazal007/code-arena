@@ -11,12 +11,13 @@ const judgeManager = JudgeManager.getInstance();
 
 const consumer = kafka.consumer({ groupId: "freeTierGroup" });
 
-type ReceivedSubmissionMessage = {
+export type ReceivedSubmissionMessage = {
     submittedCode: string;
     language: "rust" | "javascript";
     problemId: string;
     userId: string;
     submissionId: string;
+    problemName: string;
 }
 
 async function main() {
@@ -32,7 +33,11 @@ async function main() {
                 if (submittedMessage) {
                     const decodedString = String.fromCharCode(...submittedMessage.split(',').map(Number));
                     let submission: ReceivedSubmissionMessage = JSON.parse(decodedString);
-                    console.log({ submission });
+                    if (!submission.userId || !submission.language || !submission.problemId
+                        || !submission.submissionId || !submission.submittedCode || !submission.problemName) {
+                        return;
+                    }
+                    await judgeManager.handleSubmissionInit(submission);
                 }
             } catch (err) {
                 console.log("invalid submission")

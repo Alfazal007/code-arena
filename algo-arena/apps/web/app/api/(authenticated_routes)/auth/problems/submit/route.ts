@@ -34,18 +34,26 @@ export async function POST(request: NextRequest) {
             })
             return NextResponse.json(new ApiError(400, zodErrorsString, [], zodErrors), { status: 400 })
         }
-        let submittedProblem: {
-            problemId: string;
-            id: string;
-            userId: string;
-            createdAt: Date;
-            problemsId: string | null;
-        };
-
+        let submittedProblem;
+        let problemFromDB;
         try {
             await kafkaProducer.connect()
 
             try {
+                problemFromDB = await prisma.problems.findFirst({
+                    where: {
+                        id: zodParsedData.data.problemId
+                    },
+                    select: {
+                        id: true,
+                        inputTakingCodeJS: true,
+                        inputTakingCodeRust: true,
+                        name: true
+                    }
+                });
+                if (!problemFromDB) {
+                    return NextResponse.json(new ApiError(400, issueWithDatabaseString, [], []), { status: 400 })
+                }
                 submittedProblem = await prisma.userProblem.create({
                     data: {
                         userId: currentUser.id,
@@ -55,12 +63,20 @@ export async function POST(request: NextRequest) {
             } catch (err) {
                 return NextResponse.json(new ApiError(400, issueWithDatabaseString, [], []), { status: 400 })
             }
+            let codeToBeSubmitted = zodParsedData.data.code;
+            if (zodParsedData.data.language == "rust") {
+                codeToBeSubmitted += problemFromDB.inputTakingCodeRust
+            } else {
+                codeToBeSubmitted += problemFromDB.inputTakingCodeJS
+            }
+            let base64Code = btoa(codeToBeSubmitted);
             const dataToBeSentToKafka = {
-                submittedCode: zodParsedData.data.code,
+                submittedCode: base64Code,
                 language: zodParsedData.data.language,
                 problemId: zodParsedData.data.problemId,
                 userId: currentUser.id,
-                submissionId: submittedProblem.id
+                submissionId: submittedProblem.id,
+                problemName: problemFromDB.name
             }
 
             await kafkaProducer.send({
