@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { envFiles } from "../../../../utils/envLoader";
 import prisma from "@repo/database/client";
+import { envFiles } from "@/utils/envLoader";
+import axios from "axios";
 
 type ResponseTokens = {
     token: string
@@ -22,10 +23,18 @@ export async function POST(request: NextRequest) {
         let errPresent = false;
         const results = []
         let completedTestCases = 0;
+        console.log("About to hit for loop");
         for (let i = 0; i < tokensArray.length; i++) {
             const url = `https://judge0-ce.p.rapidapi.com/submissions/${tokensArray[i].token}?fields=status_id&wait=true`;
-            const response = await axios.get(url);
+            const response = await axios.get(url, {
+                headers: {
+                    "x-rapidapi-host": envFiles.apiHost,
+                    "x-rapidapi-key": envFiles.apiKey
+                }
+            }
+            );
             const body = response.data as TokenReponse;
+            console.log({ body })
             if (body.status_id == 3) {
                 results.push(true);
                 completedTestCases++;
@@ -39,6 +48,7 @@ export async function POST(request: NextRequest) {
                 results.push(false);
             }
         }
+        console.log("After for loop")
         await prisma.userProblem.update({
             where: {
                 id: submissionIdString
@@ -53,6 +63,7 @@ export async function POST(request: NextRequest) {
         });
         return NextResponse.json({}, { status: 200 })
     } catch (err) {
+        console.log(err)
         return NextResponse.json({}, { status: 200 })
     }
 }

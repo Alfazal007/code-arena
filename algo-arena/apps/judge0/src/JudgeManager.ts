@@ -22,12 +22,14 @@ export class JudgeManager {
     async createRustSummission({ stdin, submissionInfo }: { submissionInfo: ReceivedSubmissionMessage, stdin: string[] }) {
         try {
             const outputsRequired = this.readOutputFile(submissionInfo.problemName);
-            const inputsToJudge: { source_code: string, language_id: number, expected_output: string }[] = [];
+            const inputsRequired = this.readInputFile(submissionInfo.problemName);
+            const inputsToJudge: { source_code: string, language_id: number, expected_output: string, stdin: string }[] = [];
             for (let i = 0; i < outputsRequired.length; i++) {
                 inputsToJudge.push({
                     source_code: submissionInfo.submittedCode,
                     language_id: 73,
-                    expected_output: outputsRequired[i] as string
+                    expected_output: outputsRequired[i] as string,
+                    stdin: inputsRequired[i] as string
                 });
             }
             const res = await axios.post("https://judge0-ce.p.rapidapi.com/submissions/batch?base64_encoded=true",
@@ -58,7 +60,7 @@ export class JudgeManager {
     }
 
     async createJSSummission({ stdin, submissionInfo }: { submissionInfo: ReceivedSubmissionMessage, stdin: string[] }) {
-        const res = await axios.post("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=true&fields=*",
+        const res = await axios.post("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true",
             {
                 "source_code": submissionInfo.submittedCode,
                 "language_id": 93,
@@ -72,7 +74,6 @@ export class JudgeManager {
                 }
             }
         );
-        console.log({ res: res.data })
         // update in the database
     }
 
@@ -124,5 +125,28 @@ export class JudgeManager {
         }
         return outputs;
     }
+
+    private readInputFile(problemName: string) {
+        const inputFolder = path.resolve(__dirname, `../../problems/${problemName}/test`);
+        let inputs: string[] = [];
+        try {
+            if (!fs.existsSync(inputFolder)) {
+                throw new Error(`Directory does not exist: ${inputFolder}`);
+            }
+
+            const files = fs.readdirSync(inputFolder);
+            inputs = files
+                .filter(file => path.extname(file) === '.txt')
+                .map(file => {
+                    const filePath = path.join(inputFolder, file);
+                    return btoa(fs.readFileSync(filePath, 'utf8'));
+                });
+        } catch (error) {
+            console.error('Error reading test case files:', error);
+            throw error;
+        }
+        return inputs;
+    }
+
 }
 
