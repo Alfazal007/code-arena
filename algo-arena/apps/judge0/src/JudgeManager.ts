@@ -3,7 +3,6 @@ import { envFiles } from "./loadEnv";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-import { env } from "process";
 
 type ResponseTokens = {
     token: string
@@ -22,14 +21,13 @@ export class JudgeManager {
     async createRustSummission({ stdin, submissionInfo }: { submissionInfo: ReceivedSubmissionMessage, stdin: string[] }) {
         try {
             const outputsRequired = this.readOutputFile(submissionInfo.problemName);
-            const inputsRequired = this.readInputFile(submissionInfo.problemName);
             const inputsToJudge: { source_code: string, language_id: number, expected_output: string, stdin: string }[] = [];
             for (let i = 0; i < outputsRequired.length; i++) {
                 inputsToJudge.push({
                     source_code: submissionInfo.submittedCode,
                     language_id: 73,
                     expected_output: outputsRequired[i] as string,
-                    stdin: inputsRequired[i] as string
+                    stdin: stdin[i] as string
                 });
             }
             const res = await axios.post("https://judge0-ce.p.rapidapi.com/submissions/batch?base64_encoded=true",
@@ -60,21 +58,42 @@ export class JudgeManager {
     }
 
     async createJSSummission({ stdin, submissionInfo }: { submissionInfo: ReceivedSubmissionMessage, stdin: string[] }) {
-        const res = await axios.post("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true",
-            {
-                "source_code": submissionInfo.submittedCode,
-                "language_id": 93,
-                "stdin": stdin,
-                "cpu_time_limit": 2
-            },
-            {
-                headers: {
-                    "x-rapidapi-host": envFiles.apiHost,
-                    "x-rapidapi-key": envFiles.apiKey
-                }
+        try {
+            const outputsRequired = this.readOutputFile(submissionInfo.problemName);
+            const inputsToJudge: { source_code: string, language_id: number, expected_output: string, stdin: string }[] = [];
+            for (let i = 0; i < outputsRequired.length; i++) {
+                inputsToJudge.push({
+                    source_code: submissionInfo.submittedCode,
+                    language_id: 93,
+                    expected_output: outputsRequired[i] as string,
+                    stdin: stdin[i] as string
+                });
             }
-        );
-        // update in the database
+            const res = await axios.post("https://judge0-ce.p.rapidapi.com/submissions/batch?base64_encoded=true",
+                {
+                    "submissions": inputsToJudge
+                },
+                {
+                    headers: {
+                        "x-rapidapi-host": envFiles.apiHost,
+                        "x-rapidapi-key": envFiles.apiKey
+                    }
+                }
+            );
+            if (res.status != 201) {
+                return;
+            } else {
+                const tokens = res.data as ResponseTokens[];
+                const dataToBeSent: DataToBeSent = {
+                    secret: envFiles.secretUrl,
+                    submissionId: submissionInfo.submissionId,
+                    requestData: tokens
+                }
+                await axios.post("http://localhost:3001/api/updateSubmission", dataToBeSent);
+            }
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     async handleSubmissionInit(submission: ReceivedSubmissionMessage) {
@@ -125,28 +144,5 @@ export class JudgeManager {
         }
         return outputs;
     }
-
-    private readInputFile(problemName: string) {
-        const inputFolder = path.resolve(__dirname, `../../problems/${problemName}/test`);
-        let inputs: string[] = [];
-        try {
-            if (!fs.existsSync(inputFolder)) {
-                throw new Error(`Directory does not exist: ${inputFolder}`);
-            }
-
-            const files = fs.readdirSync(inputFolder);
-            inputs = files
-                .filter(file => path.extname(file) === '.txt')
-                .map(file => {
-                    const filePath = path.join(inputFolder, file);
-                    return btoa(fs.readFileSync(filePath, 'utf8'));
-                });
-        } catch (error) {
-            console.error('Error reading test case files:', error);
-            throw error;
-        }
-        return inputs;
-    }
-
 }
 
