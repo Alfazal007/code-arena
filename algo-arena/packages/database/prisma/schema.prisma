@@ -19,6 +19,7 @@ model User {
   password    String
   isPremium   Boolean       @default(false)
   userProblem UserProblem[]
+  leaderBoard LeaderBoard[]
   role        Role          @default(USER)
 }
 
@@ -33,6 +34,7 @@ model Problems {
   halfCodeJS          String
   fullCodeJS          String
   userProblem         UserProblem[]
+  contest             Contest[]
 }
 
 model UserProblem {
@@ -47,4 +49,26 @@ model UserProblem {
   errorMessage       String   @default("")
   completedTestCases Int      @default(0)
   testcaseStatus     Json     @default("[]")
+}
+
+model Contest {
+  id           String        @id @default(uuid())
+  started      Boolean       @default(false)
+  completed    Boolean       @default(false)
+  problemId    String
+  createdAt    DateTime      @default(now())
+  Problems     Problems      @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  leaderBoards LeaderBoard[]
+}
+
+model LeaderBoard {
+  id        String  @id @default(uuid())
+  contestId String
+  Contest   Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rank      Int     @default(0)
+  points    Int     @default(0)
+
+  @@unique([contestId, userId])
 }
