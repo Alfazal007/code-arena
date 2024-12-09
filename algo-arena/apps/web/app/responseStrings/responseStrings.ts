@@ -15,3 +15,5 @@ export const alreadyAdmin = "User is admin already";
 export const addedAdminSuccess = "User has been promoted to admin";
 export const createdContestSuccess = "Contest successfully created";
 export const contestNotFound = "No contest found";
+export const contestStartedAlready = "Contest already started";
+export const contestStarted = "Contest started successfully";

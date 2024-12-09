@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ApiError } from "../../../../../../utils/apiErrors";
-import { adminRoute, createdContestSuccess, issueWithDatabaseString, noRequestBodyString, problemNotFoundString, relogin, userNotFoundString, zodErrorsString } from "../../../../../responseStrings/responseStrings";
+import { adminRoute, contestNotFound, contestStarted, contestStartedAlready, createdContestSuccess, issueWithDatabaseString, noRequestBodyString, problemNotFoundString, relogin, userNotFoundString, zodErrorsString } from "../../../../../responseStrings/responseStrings";
 import { ApiResponse } from "../../../../../../utils/apiResponse";
 import { zodTypes } from "@repo/zod/zodTypes";
 import prisma from "@repo/database/client";
@@ -21,30 +21,35 @@ export async function POST(request: NextRequest) {
         } catch (err) {
             return NextResponse.json(new ApiError(400, noRequestBodyString, [], []), { status: 400 })
         }
-        const zodCheckedAddAdminType = zodTypes.startContestType.safeParse(requestBody);
-        if (!zodCheckedAddAdminType.success) {
+        const zodStartContestType = zodTypes.startContestType.safeParse(requestBody);
+        if (!zodStartContestType.success) {
             const zodErrors: string[] = []
-            zodCheckedAddAdminType.error.errors.map((err) => {
+            zodStartContestType.error.errors.map((err) => {
                 zodErrors.push(err.message)
             })
             return NextResponse.json(new ApiError(400, zodErrorsString, [], zodErrors), { status: 400 })
         }
         const contestRequired = await prisma.contest.findFirst({
             where: {
-                id: zodCheckedAddAdminType.data.contestId
+                id: zodStartContestType.data.contestId
             }
         });
         if (!contestRequired) {
-            return NextResponse.json(new ApiError(400, problemNotFoundString, [], []), { status: 404 })
+            return NextResponse.json(new ApiError(404, contestNotFound, [], []), { status: 404 })
         }
-
-        // update from here
-        await prisma.contest.create({
+        if (contestRequired.started == true) {
+            return NextResponse.json(new ApiError(400, contestStartedAlready, [], []), { status: 404 })
+        }
+        await prisma.contest.update({
+            where: {
+                id: zodStartContestType.data.contestId
+            },
             data: {
-                problemId: problemRequired.id,
+                started: true,
+                completed: false
             }
         });
-        return NextResponse.json(new ApiResponse(200, createdContestSuccess, {}), { status: 200 })
+        return NextResponse.json(new ApiResponse(200, contestStarted, {}), { status: 200 })
     } catch (err) {
         return NextResponse.json(new ApiError(400, issueWithDatabaseString, [], []), { status: 400 })
     }
