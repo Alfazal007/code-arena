@@ -10,3 +10,6 @@ export const loginSuccess = "Login successful";
 export const relogin = "Login before using the service"
 export const issueWithKafka = "Issue talking to the kafka";
 export const successfulProblemSubmission = "Problem submitted successfully";
+export const adminRoute = "You should be an admin to access this route";
+export const alreadyAdmin = "User is admin already";
+export const addedAdminSuccess = "User has been promoted to admin";
