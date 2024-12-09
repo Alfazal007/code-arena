@@ -5,6 +5,6 @@ import { signupType } from "./zodTypes/signupUserType";
 export const zodTypes = {
     signupType,
     signinType,
-    createSubmissionType
+    createSubmissionType,
 }
 
