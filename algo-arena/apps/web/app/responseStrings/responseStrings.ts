@@ -19,3 +19,4 @@ export const contestStartedAlready = "Contest already started";
 export const contestStarted = "Contest started successfully";
 export const contestNotStartedYet = "Contest not started yet";
 export const contestOver = "Contest is already finished";
+export const contestFinish = "Contest terminated";
