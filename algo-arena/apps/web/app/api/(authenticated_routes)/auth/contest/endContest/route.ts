@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         if (!redisClient.isOpen) {
             await redisClient.connect()
         }
-        const valuesWithScores = await redisClient.zRangeWithScores(`${contestRequired.id}`, 0, -1);
+        const valuesWithScores = await redisClient.zRangeWithScores(`${contestRequired.id}`, 0, -1, { REV: true });
         for (let i = 0; i < valuesWithScores.length; i++) {
             await prisma.leaderBoard.update({
                 where: {
