@@ -97,7 +97,8 @@ export async function POST(request: NextRequest) {
             problemId: problemFromDB.id,
             userId: currentUser.id,
             leaderBoardId: leaderBoardId,
-            problemName: problemFromDB.name
+            problemName: problemFromDB.name,
+            contestId: contestRequired.id
         }
 
         await kafkaProducer.send({

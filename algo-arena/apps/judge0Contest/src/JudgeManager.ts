@@ -7,7 +7,7 @@ import path from "path";
 type ResponseTokens = {
     token: string
 }
-type DataToBeSent = { requestData: ResponseTokens[], secret: string, submissionId: string }
+type DataToBeSent = { requestData: ResponseTokens[], secret: string, submissionId: string, contestId: string }
 
 export class JudgeManager {
     private static instance: JudgeManager;
@@ -48,7 +48,8 @@ export class JudgeManager {
                 const dataToBeSent: DataToBeSent = {
                     secret: envFiles.secretUrl,
                     submissionId: submissionInfo.leaderBoardId,
-                    requestData: tokens
+                    requestData: tokens,
+                    contestId: submissionInfo.contestId
                 }
                 await axios.post("http://localhost:3001/api/updateLeaderBoard", dataToBeSent);
             }
@@ -87,7 +88,8 @@ export class JudgeManager {
                 const dataToBeSent: DataToBeSent = {
                     secret: envFiles.secretUrl,
                     submissionId: submissionInfo.leaderBoardId,
-                    requestData: tokens
+                    requestData: tokens,
+                    contestId: submissionInfo.contestId
                 }
                 await axios.post("http://localhost:3001/api/updateLeaderBoard", dataToBeSent);
             }

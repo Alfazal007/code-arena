@@ -18,6 +18,7 @@ export type ReceivedSubmissionMessage = {
     userId: string;
     leaderBoardId: string;
     problemName: string;
+    contestId: string;
 }
 
 async function main() {
@@ -34,7 +35,7 @@ async function main() {
                     const decodedString = String.fromCharCode(...submittedMessage.split(',').map(Number));
                     let submission: ReceivedSubmissionMessage = JSON.parse(decodedString);
                     if (!submission.userId || !submission.language || !submission.problemId
-                        || !submission.leaderBoardId || !submission.submittedCode || !submission.problemName) {
+                        || !submission.leaderBoardId || !submission.submittedCode || !submission.problemName || !submission.contestId) {
                         return;
                     }
                     await judgeManager.handleSubmissionInit(submission);

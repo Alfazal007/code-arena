@@ -4,6 +4,7 @@ import { adminRoute, contestNotFound, contestStarted, contestStartedAlready, cre
 import { ApiResponse } from "../../../../../../utils/apiResponse";
 import { zodTypes } from "@repo/zod/zodTypes";
 import prisma from "@repo/database/client";
+import { redisClient } from "../../../../../../utils/redis";
 
 export async function POST(request: NextRequest) {
     const userHeader = request.headers.get('x-user');
@@ -40,6 +41,12 @@ export async function POST(request: NextRequest) {
         if (contestRequired.started == true) {
             return NextResponse.json(new ApiError(400, contestStartedAlready, [], []), { status: 404 })
         }
+
+        if (!redisClient.isOpen) {
+            await redisClient.connect()
+        }
+        const startTime = new Date().toISOString();
+        await redisClient.set(`contest:${contestRequired.id}:startTime`, startTime);
         await prisma.contest.update({
             where: {
                 id: zodStartContestType.data.contestId
