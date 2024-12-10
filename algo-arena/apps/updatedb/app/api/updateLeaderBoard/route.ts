@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { envFiles } from "@/utils/envLoader";
 import axios from "axios";
-import prisma from "@repo/database/client";
 import { redisClient } from "@/utils/redis";
 
 type ResponseTokens = {

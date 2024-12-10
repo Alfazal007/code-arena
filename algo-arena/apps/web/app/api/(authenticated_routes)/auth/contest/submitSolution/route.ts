@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ApiError } from "../../../../../../utils/apiErrors";
-import { contestNotFound, contestNotStartedYet, contestOver, contestStarted, issueWithDatabaseString, issueWithKafka, noRequestBodyString, problemNotFoundString, relogin, zodErrorsString } from "../../../../../responseStrings/responseStrings";
+import { contestNotFound, contestNotStartedYet, contestOver, contestStarted, issueWithDatabaseString, issueWithKafka, noRequestBodyString, problemNotFoundString, relogin, successfulProblemSubmission, zodErrorsString } from "../../../../../responseStrings/responseStrings";
 import { ApiResponse } from "../../../../../../utils/apiResponse";
 import { zodTypes } from "@repo/zod/zodTypes";
 import prisma from "@repo/database/client";
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
                 key: currentUser.id
             }]
         });
-        return NextResponse.json(new ApiResponse(200, contestStarted, {}), { status: 200 })
+        return NextResponse.json(new ApiResponse(200, successfulProblemSubmission, {}), { status: 200 })
     } catch (err) {
         return NextResponse.json(new ApiError(400, issueWithDatabaseString, [], []), { status: 400 })
     }
