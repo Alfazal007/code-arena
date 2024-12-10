@@ -17,3 +17,5 @@ export const createdContestSuccess = "Contest successfully created";
 export const contestNotFound = "No contest found";
 export const contestStartedAlready = "Contest already started";
 export const contestStarted = "Contest started successfully";
+export const contestNotStartedYet = "Contest not started yet";
+export const contestOver = "Contest is already finished";
