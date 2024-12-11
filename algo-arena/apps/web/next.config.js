@@ -3,7 +3,7 @@ const nextConfig = {
     async headers() {
         return [
             {
-                source: '/api/(.*)',  // This applies to all API routes
+                source: '/api/(.*)',  // Applies to all API routes
                 headers: [
                     {
                         key: 'Access-Control-Allow-Origin',
@@ -11,11 +11,15 @@ const nextConfig = {
                     },
                     {
                         key: 'Access-Control-Allow-Methods',
-                        value: 'GET, POST, PUT, DELETE',
+                        value: 'GET, POST, PUT, DELETE, OPTIONS',  // Add OPTIONS method
                     },
                     {
                         key: 'Access-Control-Allow-Headers',
-                        value: 'Content-Type, Authorization',
+                        value: 'Content-Type, Authorization', // Allow necessary headers
+                    },
+                    {
+                        key: 'Access-Control-Allow-Credentials',
+                        value: 'true', // Allow credentials (cookies, Authorization)
                     },
                 ],
             },
@@ -24,3 +28,4 @@ const nextConfig = {
 };
 
 export default nextConfig;
+
