@@ -47,7 +47,9 @@ export async function POST(request: NextRequest) {
         const refreshToken = await generateRefreshToken(existingUserFromDB);
         const tokens = {
             accessToken,
-            refreshToken
+            refreshToken,
+            username: existingUserFromDB.username,
+            userid: existingUserFromDB.id
         }
 
         if (!redisClient.isOpen) {

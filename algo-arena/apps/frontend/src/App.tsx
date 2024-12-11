@@ -1,15 +1,40 @@
-import './App.css'
-import { Button } from './components/ui/button'
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { SignUp } from "./components/Signup";
+import UserProvider from "./context/UserContext";
+import { SignIn } from "./components/Signin";
+import Landing from "./components/Landing";
 
-function App() {
-    return (
-        <>
-            <h1 className="text-3xl font-bold underline">
-                <Button>Click</Button>
-                Hello world!
-            </h1>
-        </>
-    )
+export interface User {
+    accessToken: string;
+    refreshToken: string;
+    username: string;
+    id: string;
 }
 
-export default App
+function App() {
+
+    const router = createBrowserRouter([
+        {
+            path: "/signup",
+            element: <SignUp />,
+        },
+        {
+            path: "/signin",
+            element: <SignIn />
+        },
+        {
+            path: "/",
+            element: <Landing />
+        },
+    ]);
+
+    return (
+        <>
+            <UserProvider>
+                <RouterProvider router={router} />
+            </UserProvider>
+        </>
+    );
+}
+
+export default App;
