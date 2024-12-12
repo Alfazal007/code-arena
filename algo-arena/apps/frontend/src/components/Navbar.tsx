@@ -1,4 +1,4 @@
-import { Home, PlusCircle, LogOut, Trophy } from 'lucide-react'
+import { Home, LogOut, Trophy } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Link, useNavigate } from 'react-router-dom'
 import { useToast } from '@/hooks/use-toast';

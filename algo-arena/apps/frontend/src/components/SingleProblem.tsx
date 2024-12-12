@@ -57,7 +57,7 @@ export const SingleProblem = () => {
                 description: "Wait for a few seconds while we are checking your solution"
             });
             const intervals = [2000, 6000, 12000];
-            intervals.forEach((interval, index) => {
+            intervals.forEach((interval) => {
                 setTimeout(async () => {
                     if (!startPolling) {
                         return;
