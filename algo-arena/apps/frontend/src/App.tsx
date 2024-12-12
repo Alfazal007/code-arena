@@ -3,6 +3,7 @@ import { SignUp } from "./components/Signup";
 import UserProvider from "./context/UserContext";
 import { SignIn } from "./components/Signin";
 import Landing from "./components/Landing";
+import { SingleProblem } from "./components/SingleProblem";
 
 export interface User {
     accessToken: string;
@@ -25,6 +26,10 @@ function App() {
         {
             path: "/",
             element: <Landing />
+        },
+        {
+            path: "/problem/:problemId",
+            element: <SingleProblem />
         },
     ]);
 

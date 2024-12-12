@@ -10,6 +10,9 @@ async function main() {
         if (!pathToTheStructureFile) {
             return;
         }
+        const pathToReadmeFile = pathToTheStructureFile.replace("structure.md", "problem.md");
+        const readMeData = fs.readFileSync(pathToReadmeFile, "utf8");
+
         const data = fs.readFileSync(pathToTheStructureFile, 'utf8');
         const lines = data.split('\n');
 
@@ -52,7 +55,8 @@ async function main() {
                     fullCodeRust: codes.rustCompleteCode,
                     halfCodeRust: codes.rustCode,
                     inputTakingCodeJS: codes.jsCodeToAddToUserCode,
-                    inputTakingCodeRust: codes.rustCodeToAddToUserCode
+                    inputTakingCodeRust: codes.rustCodeToAddToUserCode,
+                    problemDescription: readMeData
                 }
             });
             console.log("Added problem to the database");

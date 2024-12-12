@@ -28,6 +28,7 @@ const Landing = () => {
     }
 
     async function attemptProblem(problemId: string) {
+        navigate(`/problem/${problemId}`)
     }
 
     useEffect(() => {

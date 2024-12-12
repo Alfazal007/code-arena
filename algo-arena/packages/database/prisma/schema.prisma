@@ -33,6 +33,7 @@ model Problems {
   inputTakingCodeJS   String
   halfCodeJS          String
   fullCodeJS          String
+  problemDescription  String
   userProblem         UserProblem[]
   contest             Contest[]
 }
