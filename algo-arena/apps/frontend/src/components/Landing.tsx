@@ -4,6 +4,7 @@ import axios from "axios";
 import { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ProblemList from './ProblemsList';
+import Navbar from './Navbar';
 
 const Landing = () => {
     const navigate = useNavigate()
@@ -43,6 +44,7 @@ const Landing = () => {
 
     return (
         <>
+            <Navbar />
             <ProblemList problems={problems} onAttemptProblem={attemptProblem} />
         </>
     )

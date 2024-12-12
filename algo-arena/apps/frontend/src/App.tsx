@@ -4,6 +4,7 @@ import UserProvider from "./context/UserContext";
 import { SignIn } from "./components/Signin";
 import Landing from "./components/Landing";
 import { SingleProblem } from "./components/SingleProblem";
+import Contest from "./components/Contest";
 
 export interface User {
     accessToken: string;
@@ -31,6 +32,10 @@ function App() {
             path: "/problem/:problemId",
             element: <SingleProblem />
         },
+        {
+            path: "/contests",
+            element: <Contest />
+        }
     ]);
 
     return (
