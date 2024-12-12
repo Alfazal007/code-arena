@@ -37,5 +37,3 @@ export function ContestList({ contests, onAttemptProblem }: ContestListProps) {
     )
 }
 
-
-

@@ -48,7 +48,6 @@ const Contest = () => {
     }
 
     function attemptProblem(contestId: string) {
-        alert(contestId)
     }
 
     return (
