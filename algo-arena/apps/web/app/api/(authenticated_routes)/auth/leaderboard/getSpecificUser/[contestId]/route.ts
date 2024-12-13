@@ -39,7 +39,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         if (!redisScore) {
             return NextResponse.json(new ApiError(404, contestNotFound, [], []), { status: 404 })
         }
-        return NextResponse.json(new ApiResponse(200, "", { points: redisScore }), { status: 200 })
+        return NextResponse.json(new ApiResponse(200, "", {
+            points: redisScore,
+            id: "123",
+            contestId: contestId,
+            rank: 0
+        }), { status: 200 })
     } catch (err) {
         return NextResponse.json(new ApiError(400, issueWithDatabaseString, [], []), { status: 400 })
     }

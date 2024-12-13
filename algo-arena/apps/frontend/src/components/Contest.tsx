@@ -48,6 +48,8 @@ const Contest = () => {
     }
 
     function attemptProblem(contestId: string) {
+        navigate(`/contest/${contestId}`);
+        return
     }
 
     return (

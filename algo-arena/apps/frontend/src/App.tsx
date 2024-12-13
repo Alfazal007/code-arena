@@ -5,6 +5,7 @@ import { SignIn } from "./components/Signin";
 import Landing from "./components/Landing";
 import { SingleProblem } from "./components/SingleProblem";
 import Contest from "./components/Contest";
+import SingleContestScreen from "./components/SingleContest";
 
 export interface User {
     accessToken: string;
@@ -35,7 +36,11 @@ function App() {
         {
             path: "/contests",
             element: <Contest />
-        }
+        },
+        {
+            path: "/contest/:contestId",
+            element: <SingleContestScreen />
+        },
     ]);
 
     return (
