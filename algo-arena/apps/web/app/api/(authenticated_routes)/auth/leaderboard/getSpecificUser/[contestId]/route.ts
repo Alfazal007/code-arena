@@ -27,7 +27,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
                 points: true,
                 contestId: true
             }
-        });
+        })
         if (!leaderBoardDB) {
             return NextResponse.json(new ApiError(404, contestNotFound, [], []), { status: 404 });
         }
@@ -35,7 +35,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             return NextResponse.json(new ApiResponse(200, "", leaderBoardDB), { status: 200 })
         }
         const redisScore = await redisClient.zScore(contestId, leaderBoardDB.id);
-
         if (!redisScore) {
             return NextResponse.json(new ApiError(404, contestNotFound, [], []), { status: 404 })
         }

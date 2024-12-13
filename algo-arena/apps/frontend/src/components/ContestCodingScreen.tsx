@@ -46,7 +46,7 @@ export default function ContestCodingScreen({ contestId, problemId, problemDescr
 
     const fetchLeaderBoardData = async () => {
         const allLeaderBoardDataUrl = `http://localhost:3000/api/auth/leaderboard/getLeaderboardFifty/${contestId}`;
-        const myLeaderBoardDataUrl = `http://localhost:3000/api/auth/leaderboard/getSpecifiedUser/${contestId}`;
+        const myLeaderBoardDataUrl = `http://localhost:3000/api/auth/leaderboard/getSpecificUser/${contestId}`;
         try {
             const getAllLeaderBoardData = await axios.get(allLeaderBoardDataUrl, {
                 headers: {
@@ -63,9 +63,11 @@ export default function ContestCodingScreen({ contestId, problemId, problemDescr
                 }
             });
             if (getMyData.status == 200) {
+                console.log({ getMyData })
                 setMyDataPresent(true);
                 // @ts-ignore
-                setMyLeaderBoardStatus(getMyData.data.data);
+                const data: MyData = { yourId: "123", points: getMyData.data.data.points, rank: getMyData.data.data.rank }
+                setMyLeaderBoardStatus(data);
             }
         } catch (err) {
             console.log(err)

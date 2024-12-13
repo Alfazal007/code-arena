@@ -21,18 +21,10 @@ export default function Leaderbaord({ leaderboard, yourId, yourRank, yourPoints,
                 <TableRow>
                     <TableHead>Id</TableHead>
                     <TableHead>Rank</TableHead>
-                    <TableHead>Points</TableHead>
+                    <TableHead>Points(To Be Updated)</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {
-                    isMyDataPresent &&
-                    <TableRow key={yourId + yourRank + yourPoints}>
-                        <TableCell>{yourId}</TableCell>
-                        <TableCell>{yourRank}</TableCell>
-                        <TableCell>{yourPoints}</TableCell>
-                    </TableRow>
-                }
                 {leaderboard.map((leaderboard) => (
                     <TableRow key={leaderboard.leaderBoardId}>
                         <TableCell>{leaderboard.leaderBoardId}</TableCell>

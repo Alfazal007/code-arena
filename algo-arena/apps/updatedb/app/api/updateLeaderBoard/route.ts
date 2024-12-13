@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { envFiles } from "@/utils/envLoader";
 import axios from "axios";
 import { redisClient } from "@/utils/redis";
+import prisma from "@repo/database/client";
 
 type ResponseTokens = {
     token: string
@@ -57,7 +58,18 @@ export async function POST(request: NextRequest) {
             if (!redisClient.isOpen) {
                 await redisClient.connect()
             }
-            const startTimeOfContest = await redisClient.get(`contest:${contestId}:startTime`) as string;
+            let startTimeOfContest = await redisClient.get(`contest:${contestId}:startTime`) as string;
+            if (!startTimeOfContest) {
+                const contestInDB = await prisma.contest.findFirst({
+                    where: {
+                        id: contestId
+                    }
+                });
+                if (contestInDB) {
+                    await redisClient.set(`contest:${contestId}:startTime`, contestInDB.createdAt.toISOString());
+                }
+            }
+            startTimeOfContest = await redisClient.get(`contest:${contestId}:startTime`) as string;
             const currentTime = new Date().toISOString();
             let points = calculatePoints(startTimeOfContest, currentTime);
             if (!contestId || !submissionId) {
