@@ -22,12 +22,12 @@ export function ContestList({ contests, onAttemptProblem }: ContestListProps) {
                         </p>
                     </CardContent>
                     <CardFooter className="pb-6 px-6">
-                        {contest.started && !contest.completed && (
+                        {contest.started && (
                             <Button
                                 onClick={() => onAttemptProblem(contest.id)}
                                 size="lg"
                             >
-                                Attempt Problem
+                                {contest.started && !contest.completed ? "Attempt Problem" : "View problem"}
                             </Button>
                         )}
                     </CardFooter>

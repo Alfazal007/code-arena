@@ -18,6 +18,8 @@ interface CodingScreenProps {
     setJSCode: React.Dispatch<React.SetStateAction<string>>;
     problemId: string;
     contestId: string;
+    started: boolean;
+    ended: boolean;
 }
 
 interface MyData {
@@ -26,7 +28,7 @@ interface MyData {
     yourId: string
 }
 
-export default function ContestCodingScreen({ contestId, problemId, problemDescription, rustCode, jSCode, setRustCode, setJSCode }: CodingScreenProps) {
+export default function ContestCodingScreen({ contestId, started, ended, problemDescription, rustCode, jSCode, setRustCode, setJSCode }: CodingScreenProps) {
     const [language, setLanguage] = useState<'rust' | 'javascript'>('javascript')
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,10 +39,11 @@ export default function ContestCodingScreen({ contestId, problemId, problemDescr
     const [myDataPresent, setMyDataPresent] = useState(false);
 
     useEffect(() => {
-        if (!user) {
+        if (!user || !started) {
             navigate("/")
             return;
         }
+
         fetchLeaderBoardData();
     }, [])
 
@@ -166,7 +169,7 @@ export default function ContestCodingScreen({ contestId, problemId, problemDescr
                                 <SelectItem value="rust">Rust</SelectItem>
                             </SelectContent>
                         </Select>
-                        {!isSubmitting && <Button variant="default" onClick={submitCode} className="bg-blue-500 hover:bg-blue-600 text-white">Submit</Button>}
+                        {!isSubmitting && !ended && started && <Button variant="default" onClick={submitCode} className="bg-blue-500 hover:bg-blue-600 text-white">Submit</Button>}
                     </div>
                 </div>
                 <div className="bg-white h-full rounded-md p-4">

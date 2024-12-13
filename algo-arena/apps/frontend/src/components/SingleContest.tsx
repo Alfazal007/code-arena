@@ -61,10 +61,6 @@ export default function SingleContestScreen() {
 
     useEffect(() => {
         if (contest) {
-            if (contest.started == false || contest.completed == true) {
-                navigate("/");
-                return;
-            }
             if (jsCode == "" && rustCode == "") {
                 setJsCode(contest.Problems.halfCodeJS);
                 setRustCode(contest.Problems.halfCodeRust);
@@ -87,6 +83,8 @@ export default function SingleContestScreen() {
                 <ContestCodingScreen
                     contestId={contest?.id}
                     jSCode={jsCode}
+                    started={contest.started}
+                    ended={contest.completed}
                     rustCode={rustCode}
                     problemId={contest.problemId}
                     problemDescription={contest.Problems.problemDescription}

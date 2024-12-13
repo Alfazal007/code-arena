@@ -14,7 +14,7 @@ interface LeaderboardProps {
     isMyDataPresent: boolean
 }
 
-export default function Leaderbaord({ leaderboard, yourId, yourRank, yourPoints, isMyDataPresent }: LeaderboardProps) {
+export default function Leaderbaord({ leaderboard }: LeaderboardProps) {
     return (
         <Table>
             <TableHeader>
